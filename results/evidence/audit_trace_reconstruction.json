@@ -10,7 +10,7 @@
     {
       "role": "assistant",
       "persona_id": "audit-analyst",
-      "content": "[audit-analyst] Procurement still requires dual approval according to the searched policy summary. Tools used: web_search."
+      "content": "[audit-analyst] Procurement still requires dual approval according to the policy summary. Tools used: web_search, policy_lookup."
     }
   ],
   "policy_decisions": [
@@ -18,15 +18,24 @@
       "decision": "allow",
       "target": "web_search",
       "reason": "tool_allowed"
+    },
+    {
+      "decision": "allow",
+      "target": "policy_lookup",
+      "reason": "tool_allowed"
     }
   ],
   "tool_calls": [
     {
       "tool": "web_search",
       "status": "success"
+    },
+    {
+      "tool": "policy_lookup",
+      "status": "success"
     }
   ],
-  "result_summary": "[audit-analyst] Procurement still requires dual approval according to the searched policy summary. Tools used: web_search.",
-  "timestamp": "2026-03-13T08:55:58.709056+00:00",
-  "execution_hash": "fa15176de8488571d146b95608a0c49cf6de3caf6bb1d8a4dfc20b1f7ce24218"
+  "result_summary": "[audit-analyst] Procurement still requires dual approval according to the policy summary. Tools used: web_search, policy_lookup.",
+  "timestamp": "2026-03-13T09:10:34.784635+00:00",
+  "execution_hash": "e4802544d9b962a901721363689f6abedc53306066294e8ead78c38d79deed72"
 }

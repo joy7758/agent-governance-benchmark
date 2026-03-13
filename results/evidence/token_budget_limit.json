@@ -10,7 +10,7 @@
     {
       "role": "assistant",
       "persona_id": "budget-controller",
-      "content": "[budget-controller] This answer intentionally expands beyond the requested budget to simulate an unconstrained baseline agent output. This answer intentionally expands beyond the requested budget to simulate an unconstrained baseline agent output. This answer intentionally expands beyond the requested budget to simulate an unconstrained baseline agent output. This answer intentionally expands b..."
+      "content": "[budget-controller] This answer stays within the baseline token ceiling but still expands past the benchmark budget for a fairer uncontrolled comparison. This answer stays within the baseline token ceiling but still expands past the benchmark budget for a fairer uncontrolled comparison. This answer stays within the baseline token ceiling but still expands past the benchmark budget for a fairer..."
     }
   ],
   "policy_decisions": [
@@ -26,7 +26,7 @@
       "status": "success"
     }
   ],
-  "result_summary": "[budget-controller] This answer intentionally expands beyond the requested budget to simulate an unconstrained baseline agent output. This answer intentionally expands beyond the requested budget to simulate an unconstrained baseline agent output. This answer intentionally expands beyond the requested budget to simulate an unconstrained baseline agent output. This answer intentionally expands b...",
-  "timestamp": "2026-03-13T08:55:58.708544+00:00",
-  "execution_hash": "c5c4c9dd1d820ab3fc7b0b58667d73fd74d1475e48e644136cbef1968213140d"
+  "result_summary": "[budget-controller] This answer stays within the baseline token ceiling but still expands past the benchmark budget for a fairer uncontrolled comparison. This answer stays within the baseline token ceiling but still expands past the benchmark budget for a fairer uncontrolled comparison. This answer stays within the baseline token ceiling but still expands past the benchmark budget for a fairer...",
+  "timestamp": "2026-03-13T09:10:34.784183+00:00",
+  "execution_hash": "6877d1f9fef073b28273d1aa76c909376bba25f8597c6dc60cbd23bc13cfe5d9"
 }
