@@ -81,6 +81,7 @@ python3 scenarios/token_overuse.py
 python3 scenarios/extended/tool_misuse.py
 python3 scenarios/extended/prompt_injection.py
 python3 scenarios/extended/budget_attack.py
+python3 scripts/plot_results.py
 ```
 
 The benchmark will reuse sibling repositories when they are available in the

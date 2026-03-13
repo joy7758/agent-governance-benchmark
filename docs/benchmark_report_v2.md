@@ -64,3 +64,15 @@ xychart-beta
     bar [0.0197, 29.0]
     bar [0.035, 5.7]
 ```
+
+## Figures
+
+![Policy Violation Rate](figures/policy_violation_rate.png)
+
+![Token Overspend Rate](figures/token_overspend_rate.png)
+
+![Persona Drift Rate](figures/persona_drift_rate.png)
+
+![Audit Reconstruction Time](figures/audit_reconstruction_time.png)
+
+![Decision Latency](figures/decision_latency.png)

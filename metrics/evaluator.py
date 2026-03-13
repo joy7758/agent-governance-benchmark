@@ -432,6 +432,18 @@ xychart-beta
     bar [{baseline["decision_latency"]}, {baseline["audit_reconstruction_time"]}]
     bar [{governed["decision_latency"]}, {governed["audit_reconstruction_time"]}]
 ```
+
+## Figures
+
+![Policy Violation Rate](figures/policy_violation_rate.png)
+
+![Token Overspend Rate](figures/token_overspend_rate.png)
+
+![Persona Drift Rate](figures/persona_drift_rate.png)
+
+![Audit Reconstruction Time](figures/audit_reconstruction_time.png)
+
+![Decision Latency](figures/decision_latency.png)
 """
 
 
