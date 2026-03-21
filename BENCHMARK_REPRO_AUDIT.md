@@ -10,5 +10,5 @@
 
 1. installed dependency import
 2. `TOKEN_GOVERNOR_REPO` / `ARO_AUDIT_REPO`
-3. sibling repos `../token-governor` and `../aro-audit`
+3. workspace-local sibling repos for `token-governor` and `aro-audit`
 4. explicit error with remediation guidance

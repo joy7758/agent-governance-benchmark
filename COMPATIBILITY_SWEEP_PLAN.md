@@ -16,7 +16,7 @@ Align the benchmark harness with the latest canonical package surfaces exposed b
 
 ## Compatibility targets
 
-1. Replace legacy `validator.py` assumptions with `aro_audit.validation`.
+1. Replace legacy root audit validation assumptions with `aro_audit.validation`.
 2. Ensure bootstrap validates both the adapter import used by the harness and the new `governor.cli` package surface.
 3. Remove any lingering references to retired root-level MVK prototype files.
 4. Document canonical module paths and fallback rules in one place.

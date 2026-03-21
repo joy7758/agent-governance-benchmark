@@ -13,6 +13,12 @@ Deterministic offline benchmark harness for governed-vs-baseline comparisons.
 - not the architecture hub
 - not the demo repo
 
+## Start here
+
+- `docs/dependency-compatibility.md`
+- `scenarios/`
+- `Makefile`
+
 ## Benchmark scope
 
 - restricted tool access
