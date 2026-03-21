@@ -7,10 +7,14 @@ from tempfile import TemporaryDirectory
 from scripts.bootstrap import resolve_dependencies
 
 
-class BootstrapResolutionTests(unittest.TestCase):
+class DependencyResolutionTests(unittest.TestCase):
     def test_installed_dependency_wins(self) -> None:
         def probe(module_name: str, required_attrs: tuple[str, ...]) -> bool:
-            return module_name in {"adapters.langchain_middleware", "validator"}
+            return module_name in {
+                "adapters.langchain_middleware",
+                "governor.cli",
+                "aro_audit.validation",
+            }
 
         resolved = resolve_dependencies(
             env={},
@@ -18,6 +22,15 @@ class BootstrapResolutionTests(unittest.TestCase):
             module_probe=probe,
         )
         self.assertEqual(resolved["token_governor"]["source"], "installed")
+        self.assertEqual(resolved["aro_audit"]["source"], "installed")
+        self.assertEqual(
+            resolved["token_governor"]["expected_imports"],
+            ["adapters.langchain_middleware", "governor.cli"],
+        )
+        self.assertEqual(
+            resolved["aro_audit"]["expected_imports"],
+            ["aro_audit.validation"],
+        )
 
     def test_env_var_beats_sibling(self) -> None:
         with TemporaryDirectory() as temp_dir:
@@ -26,11 +39,15 @@ class BootstrapResolutionTests(unittest.TestCase):
             sibling_repo = workspace / "token-governor"
             env_repo.joinpath("adapters").mkdir(parents=True)
             env_repo.joinpath("adapters", "langchain_middleware.py").write_text("", encoding="utf-8")
+            env_repo.joinpath("governor").mkdir(parents=True)
+            env_repo.joinpath("governor", "cli.py").write_text("", encoding="utf-8")
             sibling_repo.joinpath("adapters").mkdir(parents=True)
             sibling_repo.joinpath("adapters", "langchain_middleware.py").write_text("", encoding="utf-8")
+            sibling_repo.joinpath("governor").mkdir(parents=True)
+            sibling_repo.joinpath("governor", "cli.py").write_text("", encoding="utf-8")
             aro_repo = workspace / "aro-audit"
-            aro_repo.mkdir(parents=True)
-            aro_repo.joinpath("validator.py").write_text("", encoding="utf-8")
+            aro_repo.joinpath("aro_audit").mkdir(parents=True)
+            aro_repo.joinpath("aro_audit", "validation.py").write_text("", encoding="utf-8")
 
             resolved = resolve_dependencies(
                 env={"TOKEN_GOVERNOR_REPO": str(env_repo)},
@@ -46,9 +63,11 @@ class BootstrapResolutionTests(unittest.TestCase):
             tg_repo = workspace / "token-governor"
             tg_repo.joinpath("adapters").mkdir(parents=True)
             tg_repo.joinpath("adapters", "langchain_middleware.py").write_text("", encoding="utf-8")
+            tg_repo.joinpath("governor").mkdir(parents=True)
+            tg_repo.joinpath("governor", "cli.py").write_text("", encoding="utf-8")
             aro_repo = workspace / "aro-audit"
-            aro_repo.mkdir(parents=True)
-            aro_repo.joinpath("validator.py").write_text("", encoding="utf-8")
+            aro_repo.joinpath("aro_audit").mkdir(parents=True)
+            aro_repo.joinpath("aro_audit", "validation.py").write_text("", encoding="utf-8")
 
             resolved = resolve_dependencies(
                 env={},
@@ -68,3 +87,24 @@ class BootstrapResolutionTests(unittest.TestCase):
                     module_probe=lambda module_name, attrs: False,
                 )
         self.assertIn("Unable to resolve token_governor", str(ctx.exception))
+        self.assertIn("governor.cli", str(ctx.exception))
+        self.assertIn("installed package -> TOKEN_GOVERNOR_REPO -> sibling repo", str(ctx.exception))
+
+    def test_invalid_env_var_reports_expected_markers(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            workspace = Path(temp_dir)
+            tg_repo = workspace / "token-governor"
+            tg_repo.joinpath("adapters").mkdir(parents=True)
+            tg_repo.joinpath("adapters", "langchain_middleware.py").write_text("", encoding="utf-8")
+            tg_repo.joinpath("governor").mkdir(parents=True)
+            tg_repo.joinpath("governor", "cli.py").write_text("", encoding="utf-8")
+            bad_repo = workspace / "broken-aro-audit"
+            bad_repo.mkdir(parents=True)
+            with self.assertRaises(RuntimeError) as ctx:
+                resolve_dependencies(
+                    env={"ARO_AUDIT_REPO": str(bad_repo)},
+                    workspace_root=workspace,
+                    module_probe=lambda module_name, attrs: False,
+                )
+        self.assertIn("ARO_AUDIT_REPO points to", str(ctx.exception))
+        self.assertIn("aro_audit/validation.py", str(ctx.exception))

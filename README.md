@@ -44,6 +44,13 @@ make scenarios
 make report
 ```
 
+## Dependency compatibility
+
+- canonical governance runtime lives in `token-governor`; the benchmark consumes `adapters.langchain_middleware` and expects `governor.cli`
+- canonical audit validation lives in `aro_audit.validation`
+- optional MVK verification uses `kernel.verify` only when a scenario explicitly opts into execution-integrity checks
+- fallback order is installed package, then environment variable override, then sibling repo discovery
+
 ## Output
 
 - fresh run output goes to `results/`

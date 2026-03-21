@@ -12,8 +12,12 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 DEPENDENCY_RESOLUTION = ensure_dependencies()
 
 from adapters.langchain_middleware import wrap_agent
+from aro_audit.validation import (
+    build_evidence_object,
+    summarize_evidence,
+    validate_evidence_data,
+)
 from harness.baseline.langchain_agent import BaselineLangChainAgent
-from validator import build_evidence_object, summarize_evidence, validate_evidence_data
 
 
 class GovernedAgent:

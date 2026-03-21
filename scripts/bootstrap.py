@@ -19,18 +19,23 @@ DEPENDENCIES = {
         "sibling": "token-governor",
         "module": "adapters.langchain_middleware",
         "attrs": ("wrap_agent",),
-        "marker": ("adapters", "langchain_middleware.py"),
+        "markers": (
+            ("adapters", "langchain_middleware.py"),
+            ("governor", "cli.py"),
+        ),
+        "compat_modules": (("governor.cli", ("main",)),),
     },
     "aro_audit": {
         "env_var": "ARO_AUDIT_REPO",
         "sibling": "aro-audit",
-        "module": "validator",
+        "module": "aro_audit.validation",
         "attrs": (
             "build_evidence_object",
             "summarize_evidence",
             "validate_evidence_data",
         ),
-        "marker": ("validator.py",),
+        "markers": (("aro_audit", "validation.py"),),
+        "compat_modules": (),
     },
 }
 
@@ -43,8 +48,17 @@ def _module_probe(module_name: str, required_attrs: tuple[str, ...]) -> bool:
     return all(hasattr(module, attr) for attr in required_attrs)
 
 
-def _valid_repo_path(path: Path, marker: tuple[str, ...]) -> bool:
-    return path.exists() and path.joinpath(*marker).exists()
+def _validate_repo_path(path: Path, markers: tuple[tuple[str, ...], ...]) -> bool:
+    return path.exists() and all(path.joinpath(*marker).exists() for marker in markers)
+
+
+def _dependency_message(name: str, spec: dict[str, Any]) -> str:
+    expected_modules = [str(spec["module"])] + [module for module, _attrs in spec["compat_modules"]]
+    return (
+        f"Unable to resolve {name}. Expected import paths: {', '.join(expected_modules)}. "
+        f"Fallback order: installed package -> {spec['env_var']} -> sibling repo "
+        f"'{spec['sibling']}'."
+    )
 
 
 def resolve_dependency(
@@ -59,39 +73,48 @@ def resolve_dependency(
     spec = DEPENDENCIES[name]
     module_name = str(spec["module"])
     required_attrs = tuple(spec["attrs"])
-    marker = tuple(spec["marker"])
+    markers = tuple(tuple(marker) for marker in spec["markers"])
+    compat_modules = tuple((module, tuple(attrs)) for module, attrs in spec["compat_modules"])
 
-    if module_probe(module_name, required_attrs):
-        return {"name": name, "source": "installed", "path": None, "module": module_name}
+    if module_probe(module_name, required_attrs) and all(
+        module_probe(extra_module, extra_attrs) for extra_module, extra_attrs in compat_modules
+    ):
+        expected_imports = [module_name] + [module for module, _attrs in compat_modules]
+        return {
+            "name": name,
+            "source": "installed",
+            "path": None,
+            "module": module_name,
+            "expected_imports": expected_imports,
+        }
 
     env_path = env.get(str(spec["env_var"]))
     if env_path:
         candidate = Path(env_path).expanduser()
-        if _valid_repo_path(candidate, marker):
+        if _validate_repo_path(candidate, markers):
             return {
                 "name": name,
                 "source": "env",
                 "path": str(candidate.resolve()),
                 "module": module_name,
+                "expected_imports": [module_name] + [module for module, _attrs in compat_modules],
             }
         raise RuntimeError(
-            f"{spec['env_var']} points to {candidate}, but required marker "
-            f"{Path(*marker)} was not found."
+            f"{spec['env_var']} points to {candidate}, but canonical modules "
+            f"{', '.join(str(Path(*marker)) for marker in markers)} were not found."
         )
 
     sibling_path = workspace_root / str(spec["sibling"])
-    if _valid_repo_path(sibling_path, marker):
+    if _validate_repo_path(sibling_path, markers):
         return {
             "name": name,
             "source": "sibling",
             "path": str(sibling_path.resolve()),
             "module": module_name,
+            "expected_imports": [module_name] + [module for module, _attrs in compat_modules],
         }
 
-    raise RuntimeError(
-        f"Unable to resolve {name}. Install {module_name}, set {spec['env_var']}, "
-        f"or place {spec['sibling']} beside this repo."
-    )
+    raise RuntimeError(_dependency_message(name, spec))
 
 
 def resolve_dependencies(
