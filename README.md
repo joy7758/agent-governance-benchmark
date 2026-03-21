@@ -1,91 +1,56 @@
 # Agent Governance Benchmark
 
-Minimal governance benchmark suite for comparing a baseline agent against a
-governed agent on policy enforcement, token control, persona consistency, and
-audit reconstruction.
+Deterministic offline benchmark harness for governed-vs-baseline comparisons.
 
-## Benchmark Goal
+## Role
 
-Demonstrate the smallest evidence loop for the claim:
+`agent-governance-benchmark` is the benchmark-only evaluation repo for governance behavior. It packages scenarios, harness wrappers, metrics computation, and reproducibility helpers without re-implementing the canonical governance or audit libraries.
 
-**Governed Agent < Baseline Agent on policy violation rate, token overspend
-rate, persona drift rate, and audit reconstruction time.**
+## Not this repo
 
-This suite is intentionally deterministic and offline so it can be reproduced
-without model API keys.
+- not the governance runtime implementation
+- not the audit implementation
+- not the architecture hub
+- not the demo repo
 
-## Baseline vs Governed comparison
+## Benchmark scope
 
-- Baseline Agent: LangChain-style agent with standard guardrails, tool
-  whitelist, and token limit
-- Governed Agent: same task execution path wrapped with Token Governor
-  middleware plus ARO audit logging
-- Output: JSON report with the following metrics
-  - `policy_violation_rate`
-  - `token_overspend_rate`
-  - `persona_drift_rate`
-  - `audit_reconstruction_time`
-  - `decision_latency`
-  - `false_positive_rate`
-  - `task_success_rate`
+- restricted tool access
+- tool misuse
+- prompt injection
+- token budget limit
+- budget attack
+- persona consistency
+- audit reconstruction
 
-## Scenarios
+## Reproducibility
 
-1. Restricted tool access
-2. Tool misuse
-3. Prompt injection
-4. Token budget limit
-5. Budget attack
-6. Persona consistency conversation
-7. Audit trace reconstruction
+- deterministic and offline
+- no model API key required
+- dependency resolution via installed package first, then environment variables, then sibling repo fallback
 
-## How to reproduce
+## Depends on
+
+- [token-governor](https://github.com/joy7758/token-governor)
+- [aro-audit](https://github.com/joy7758/aro-audit)
+- optional future evidence substrate integration: [agent-evidence](https://github.com/joy7758/agent-evidence)
+
+## Run
 
 ```bash
-python3 scenarios/policy_violation.py
-python3 scenarios/token_overuse.py
-python3 scenarios/extended/tool_misuse.py
-python3 scenarios/extended/prompt_injection.py
-python3 scenarios/extended/budget_attack.py
+python -m scripts.bootstrap
+make smoke
+make scenarios
+make report
 ```
 
-Outputs:
+## Output
 
-- `results/report.json`
-- `results/report_v2.json`
-- `results/example_results.json`
-- `docs/benchmark_report.md`
-- `docs/benchmark_report_v2.md`
+- fresh run output goes to `results/`
+- committed historical samples live under `docs/results-snapshots/`
 
-## Benchmark reproducibility
+## Status
 
-### Environment
-
-- Python 3.11+
-- Local sibling repositories:
-  - `../token-governor`
-  - `../aro-audit`
-
-### Dependencies
-
-- Python standard library
-- Local Token Governor middleware
-- Local ARO Audit validator and evidence builder
-
-### Exact commands to reproduce results
-
-```bash
-cd /Users/zhangbin/GitHub/agent-governance-benchmark
-python3 scenarios/policy_violation.py
-python3 scenarios/token_overuse.py
-python3 scenarios/extended/tool_misuse.py
-python3 scenarios/extended/prompt_injection.py
-python3 scenarios/extended/budget_attack.py
-python3 scripts/plot_results.py
-```
-
-The benchmark will reuse sibling repositories when they are available in the
-same parent directory:
-
-- `../token-governor`
-- `../aro-audit`
+- benchmark-only
+- portable repro path enabled
+- no absolute local paths

@@ -7,8 +7,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from baseline.langchain_agent import BaselineLangChainAgent
-from governed.governed_agent import GovernedAgent
+from harness.baseline.langchain_agent import BaselineLangChainAgent
+from harness.governed.governed_agent import GovernedAgent
 
 
 ROOT = Path(__file__).resolve().parents[1]

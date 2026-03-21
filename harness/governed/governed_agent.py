@@ -3,21 +3,16 @@
 from __future__ import annotations
 
 import json
-import sys
 from pathlib import Path
 from typing import Any
 
+from scripts.bootstrap import ensure_dependencies
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-WORKSPACE_ROOT = Path(__file__).resolve().parents[2]
-
-for sibling in ("token-governor", "aro-audit"):
-    sibling_path = WORKSPACE_ROOT / sibling
-    if sibling_path.exists():
-        sys.path.insert(0, str(sibling_path))
+REPO_ROOT = Path(__file__).resolve().parents[2]
+DEPENDENCY_RESOLUTION = ensure_dependencies()
 
 from adapters.langchain_middleware import wrap_agent
-from baseline.langchain_agent import BaselineLangChainAgent
+from harness.baseline.langchain_agent import BaselineLangChainAgent
 from validator import build_evidence_object, summarize_evidence, validate_evidence_data
 
 
@@ -90,6 +85,7 @@ class GovernedAgent:
                 "evidence_valid": ok,
                 "evidence_errors": errors,
                 "audit_summary": summarize_evidence(evidence),
+                "dependency_resolution": DEPENDENCY_RESOLUTION,
                 "decision_latency": round(
                     0.021
                     + 0.005 * len(result.get("requested_tools", []))
